@@ -15,11 +15,9 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
     implementation 'io.lettuce:lettuce-core:6.2.6.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
