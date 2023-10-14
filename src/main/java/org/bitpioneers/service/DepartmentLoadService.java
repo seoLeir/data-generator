@@ -81,7 +81,7 @@ public class DepartmentLoadService {
                             String.valueOf(random.nextInt(oldValue, oldValue + 10)), timeToLive, TimeUnit.MINUTES);
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error(e.toString());
             }
         });
     }
