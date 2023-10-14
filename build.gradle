@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'org.bitpioneers'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 
 repositories {
     mavenLocal()
@@ -22,6 +22,21 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
+
+jar{
+    def jars = configurations.runtimeClasspath.files.collect { "/lib$it.name" }
+    manifest {
+        attributes 'Main-Class': 'org.bitpioneers.ApplicationRunner',
+                    'Class-Path': jars.join(' ')
+    }
+}
+
+task copyAllDependencies(type: Copy){
+    from(configurations.runtimeClasspath.files)
+    into("$buildDir/libs/lib")
+}
+
+jar.dependsOn copyAllDependencies
 
 test {
     useJUnitPlatform()

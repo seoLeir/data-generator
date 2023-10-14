@@ -5,5 +5,9 @@ public enum ServiceType {
     LOAN,
     POST,
     FINE,
-    INSURANCE
+    INSURANCE;
+
+    public static ServiceType getRandom() {
+        return values()[(int) (Math.random() * values().length)];
+    }
 }

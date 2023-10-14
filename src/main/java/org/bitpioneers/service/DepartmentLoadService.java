@@ -6,10 +6,12 @@ import org.bitpioneers.types.PersonType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 @Slf4j
 @Service
@@ -17,43 +19,124 @@ public class DepartmentLoadService {
     private final RedisTemplate<String, String> redisTemplate;
     private final List<DepartmentInfo> departmentInfoList;
     private final Random random;
+    private final DateTimeService dateTimeService;
+    private final AtomicInteger juridicalPersonType = new AtomicInteger(0);
+    private final AtomicInteger physicalPersonType = new AtomicInteger(0);
 
-    public DepartmentLoadService(RedisTemplate<String, String> redisTemplate, DepartmentService departmentService) {
+    public DepartmentLoadService(RedisTemplate<String, String> redisTemplate,
+                                 DepartmentService departmentService, DateTimeService dateTimeService) {
         this.redisTemplate = redisTemplate;
-        departmentInfoList = departmentService.load();
+        this.departmentInfoList = departmentService.load();
+        this.dateTimeService = dateTimeService;
         random = new Random();
     }
 
-    @Scheduled(fixedRate = 10,
-            initialDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 30)}",
-            timeUnit = TimeUnit.MINUTES)
-    public synchronized void addLegalEntityTicket(){
+    @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 10)}",
+            timeUnit = TimeUnit.SECONDS)
+    public synchronized void addJuridicalTicket(){
+        log.info("Ticket was created for juridical person");
         departmentInfoList.forEach(departmentInfo -> {
             Long id = departmentInfo.getId();
+            String timeLine = departmentInfo.getScheduleJurL();
             try {
-                Thread.sleep((random.nextInt(1, 60) * 1000L));
-                String redisKey = id + ":" + PersonType.LEGAL_ENTITY.ordinal();
-//                redisTemplate.opsForValue().setIfPresent();
-            } catch (InterruptedException e) {
+//                Thread.sleep((random.nextInt(1,60) * 100L));
+                String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":current";
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)){
+                    return;
+                }
+                long timeToLive = dateTimeService.getTimeToLive(timeLine);
+                if (redisTemplate.opsForValue().get(redisKey) == null){
+                    redisTemplate.opsForValue().set(redisKey, "1", timeToLive);
+                }else {
+                    int oldValue= Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
+                    redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive);
+                }
+                juridicalPersonType.incrementAndGet();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    /*@Scheduled
-    public void loadLegalEntityAllTicket(){
-
+    @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 10)}",
+            timeUnit = TimeUnit.SECONDS)
+    public void loadJuridicalAllTicket(){
+        log.info("Load juridical ticket to all tickets");
+        departmentInfoList.forEach(departmentInfo -> {
+            Long id = departmentInfo.getId();
+            String timeLine = departmentInfo.getScheduleJurL();
+            try {
+//                Thread.sleep((random.nextInt(1,60) * 100L));
+                String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":total";
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)){
+                    return;
+                }
+                long timeToLive = dateTimeService.getTimeToLive(timeLine);
+                if (redisTemplate.opsForValue().get(redisKey) == null){
+                    redisTemplate.opsForValue().set(redisKey, "1", timeToLive);
+                }else {
+                    int oldValue= Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
+                    redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive);
+                }
+                juridicalPersonType.incrementAndGet();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    @Scheduled
+    @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 10)}",
+            timeUnit = TimeUnit.SECONDS)
     public void addIndividualTicket(){
-
+        log.info("Ticket was created for physical person");
+        departmentInfoList.forEach(departmentInfo -> {
+            Long id = departmentInfo.getId();
+            String timeLine = departmentInfo.getScheduleJurL();
+            try {
+//                Thread.sleep((random.nextInt(1,60) * 100L));
+                String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":current";
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)){
+                    return;
+                }
+                long timeToLive = dateTimeService.getTimeToLive(timeLine);
+                if (redisTemplate.opsForValue().get(redisKey) == null){
+                    redisTemplate.opsForValue().set(redisKey, "1", timeToLive);
+                }else {
+                    int oldValue= Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
+                    redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive);
+                }
+                physicalPersonType.incrementAndGet();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    @Scheduled
+    @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 10)}",
+            timeUnit = TimeUnit.SECONDS)
     public void loadIndividualAllTicket(){
-
-    }*/
-
+        log.info("Load physical ticket to all tickets");
+        departmentInfoList.forEach(departmentInfo -> {
+            Long id = departmentInfo.getId();
+            String timeLine = departmentInfo.getScheduleJurL();
+            try {
+//                Thread.sleep((random.nextInt(1,60) * 100L));
+                String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":total";
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)){
+                    return;
+                }
+                long timeToLive = dateTimeService.getTimeToLive(timeLine);
+                if (redisTemplate.opsForValue().get(redisKey) == null){
+                    redisTemplate.opsForValue().set(redisKey, "1", timeToLive);
+                }else {
+                    int oldValue= Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
+                    redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive);
+                }
+                physicalPersonType.incrementAndGet();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 
 }

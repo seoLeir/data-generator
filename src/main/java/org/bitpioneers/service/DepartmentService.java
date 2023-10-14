@@ -24,6 +24,7 @@ public class DepartmentService {
     private final ObjectMapper objectMapper;
 
     public List<DepartmentInfo> load(){
+        log.info("Loading departments");
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest httpRequest = HttpRequest.newBuilder()
