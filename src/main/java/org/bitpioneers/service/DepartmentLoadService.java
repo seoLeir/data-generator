@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -39,17 +38,17 @@ public class DepartmentLoadService {
             try {
                 Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":current";
-                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
-                    return;
-                }
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) return;
                 long timeToLive = dateTimeService.getTimeToLive(timeLine);
-                if (redisTemplate.opsForValue().get(redisKey) == null) {
+                if (redisTemplate.opsForValue().get(redisKey) == null)
                     redisTemplate.opsForValue().set(redisKey, "1", timeToLive, TimeUnit.MINUTES);
-                } else {
-                    int totalTickets = Integer.parseInt(
-                            Objects.requireNonNull(redisTemplate
-                                    .opsForValue().get(id + ":" + PersonType.JURIDICAL.getValue() + ":total")));
-                    int oldValue = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
+                else {
+                    String tempvalue = redisTemplate.opsForValue().get(id + ":" + PersonType.JURIDICAL.getValue() + ":total");
+                    if (tempvalue == null) return;
+                    int totalTickets = Integer.parseInt(tempvalue);
+                    String value = redisTemplate.opsForValue().get(redisKey);
+                    if (value == null) return;
+                    int oldValue = Integer.parseInt(value);
                     if (oldValue < totalTickets) {
                         redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive, TimeUnit.MINUTES);
                     }
@@ -70,17 +69,16 @@ public class DepartmentLoadService {
             try {
                 Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":total";
-                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
-                    return;
-                }
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) return;
                 long timeToLive = dateTimeService.getTimeToLive(timeLine);
-
-                if (redisTemplate.opsForValue().get(redisKey) == null) {
+                if (redisTemplate.opsForValue().get(redisKey) == null)
                     redisTemplate.opsForValue().set(redisKey, "1", timeToLive, TimeUnit.MINUTES);
-                } else {
-                    int oldValue = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
-                    int newValue = new Random().nextInt(oldValue, oldValue + 10);
-                    redisTemplate.opsForValue().set(redisKey, String.valueOf(newValue), timeToLive, TimeUnit.MINUTES);
+                else {
+                    String value = redisTemplate.opsForValue().get(redisKey);
+                    if (value == null) return;
+                    int oldValue = Integer.parseInt(value);
+                    redisTemplate.opsForValue().set(redisKey,
+                            String.valueOf(random.nextInt(oldValue, oldValue + 10)), timeToLive, TimeUnit.MINUTES);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -98,16 +96,16 @@ public class DepartmentLoadService {
             try {
                 Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":current";
-                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
-                    return;
-                }
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) return;
                 long timeToLive = dateTimeService.getTimeToLive(timeLine);
-                if (redisTemplate.opsForValue().get(redisKey) == null) {
+                if (redisTemplate.opsForValue().get(redisKey) == null)
                     redisTemplate.opsForValue().set(redisKey, "1", timeToLive, TimeUnit.MINUTES);
-                } else {
-                    int totalPhysicalTickets = Integer.parseInt(Objects.requireNonNull(
-                            redisTemplate.opsForValue().get(id + ":" + PersonType.PHYSICAL.getValue() + ":total")));
-                    int oldValue = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
+                else {
+                    String value = redisTemplate.opsForValue().get(id + ":" + PersonType.PHYSICAL.getValue() + ":total");
+                    String valueToCheck = redisTemplate.opsForValue().get(redisKey);
+                    if (value == null || valueToCheck == null) return;
+                    int totalPhysicalTickets = Integer.parseInt(value);
+                    int oldValue = Integer.parseInt(valueToCheck);
                     if (oldValue < totalPhysicalTickets) {
                         redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive, TimeUnit.MINUTES);
                     }
@@ -128,16 +126,16 @@ public class DepartmentLoadService {
             try {
                 Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":total";
-                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
-                    return;
-                }
+                if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) return;
                 long timeToLive = dateTimeService.getTimeToLive(timeLine);
-                if (redisTemplate.opsForValue().get(redisKey) == null) {
+                if (redisTemplate.opsForValue().get(redisKey) == null)
                     redisTemplate.opsForValue().set(redisKey, "1", timeToLive, TimeUnit.MINUTES);
-                } else {
-                    int oldValue = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
-                    int newValue = new Random().nextInt(oldValue, oldValue + 20);
-                    redisTemplate.opsForValue().set(redisKey, String.valueOf(newValue), timeToLive, TimeUnit.MINUTES);
+                else {
+                    String value = redisTemplate.opsForValue().get(redisKey);
+                    if (value == null) return;
+                    int oldValue = Integer.parseInt(value);
+                    redisTemplate.opsForValue().set(redisKey,
+                            String.valueOf(random.nextInt(oldValue, oldValue + 20)), timeToLive, TimeUnit.MINUTES);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
