@@ -6,4 +6,9 @@ spring:
   messages:
     encoding: UTF-8
 server:
-  port: 808
+  port: 8088
+
+app:
+  data-generator:
+    time-check-mode: false
+

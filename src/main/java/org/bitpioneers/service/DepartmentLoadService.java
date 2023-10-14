@@ -30,14 +30,14 @@ public class DepartmentLoadService {
     }
 
     @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 60)}",
-            timeUnit = TimeUnit.MINUTES)
+            timeUnit = TimeUnit.SECONDS)
     public void addJuridicalTicket() {
         log.info("Ticket was created for juridical person");
         departmentInfoList.forEach(departmentInfo -> {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-                Thread.sleep((random.nextInt(1, 60) * 100L));
+//                Thread.sleep((random.nextInt(1, 60) * 100L));
                 String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":current";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
@@ -61,14 +61,14 @@ public class DepartmentLoadService {
     }
 
     @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 50)}",
-            timeUnit = TimeUnit.MINUTES)
+            timeUnit = TimeUnit.SECONDS)
     public void loadJuridicalAllTicket() {
         log.info("Load juridical ticket to all tickets");
         departmentInfoList.forEach(departmentInfo -> {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-                Thread.sleep((random.nextInt(1, 60) * 100L));
+//                Thread.sleep((random.nextInt(1, 60) * 100L));
                 String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":total";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
@@ -87,14 +87,14 @@ public class DepartmentLoadService {
     }
 
     @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 15)}",
-            timeUnit = TimeUnit.MINUTES)
+            timeUnit = TimeUnit.SECONDS)
     public void addIndividualTicket() {
         log.info("Ticket was created for physical person");
         departmentInfoList.forEach(departmentInfo -> {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-                Thread.sleep((random.nextInt(1, 60) * 100L));
+//                Thread.sleep((random.nextInt(1, 60) * 100L));
                 String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":current";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
@@ -117,14 +117,14 @@ public class DepartmentLoadService {
     }
 
     @Scheduled(fixedDelayString = "#{T(java.util.concurrent.ThreadLocalRandom).current().nextInt(1, 10)}",
-            timeUnit = TimeUnit.MINUTES)
+            timeUnit = TimeUnit.SECONDS)
     public void loadIndividualAllTicket() {
         log.info("Load physical ticket to all tickets");
         departmentInfoList.forEach(departmentInfo -> {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-                Thread.sleep((random.nextInt(1, 60) * 100L));
+//                Thread.sleep((random.nextInt(1, 60) * 100L));
                 String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":total";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
