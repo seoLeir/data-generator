@@ -37,7 +37,7 @@ public class DepartmentLoadService {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-//                Thread.sleep((random.nextInt(1, 60) * 100L));
+                Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":current";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
@@ -68,17 +68,19 @@ public class DepartmentLoadService {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-//                Thread.sleep((random.nextInt(1, 60) * 100L));
+                Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.JURIDICAL.getValue() + ":total";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
                 }
                 long timeToLive = dateTimeService.getTimeToLive(timeLine);
+
                 if (redisTemplate.opsForValue().get(redisKey) == null) {
                     redisTemplate.opsForValue().set(redisKey, "1", timeToLive, TimeUnit.MINUTES);
                 } else {
                     int oldValue = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
-                    redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive, TimeUnit.MINUTES);
+                    int newValue = new Random().nextInt(oldValue, oldValue + 10);
+                    redisTemplate.opsForValue().set(redisKey, String.valueOf(newValue), timeToLive, TimeUnit.MINUTES);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -94,7 +96,7 @@ public class DepartmentLoadService {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-//                Thread.sleep((random.nextInt(1, 60) * 100L));
+                Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":current";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
@@ -124,7 +126,7 @@ public class DepartmentLoadService {
             Long id = departmentInfo.getId();
             String timeLine = departmentInfo.getScheduleJurL();
             try {
-//                Thread.sleep((random.nextInt(1, 60) * 100L));
+                Thread.sleep(random.nextInt(1, 60));
                 String redisKey = id + ":" + PersonType.PHYSICAL.getValue() + ":total";
                 if (!dateTimeService.isAllowedByDay() || !dateTimeService.isAllowedByTime(timeLine)) {
                     return;
@@ -134,7 +136,8 @@ public class DepartmentLoadService {
                     redisTemplate.opsForValue().set(redisKey, "1", timeToLive, TimeUnit.MINUTES);
                 } else {
                     int oldValue = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)));
-                    redisTemplate.opsForValue().set(redisKey, String.valueOf(++oldValue), timeToLive, TimeUnit.MINUTES);
+                    int newValue = new Random().nextInt(oldValue, oldValue + 20);
+                    redisTemplate.opsForValue().set(redisKey, String.valueOf(newValue), timeToLive, TimeUnit.MINUTES);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
