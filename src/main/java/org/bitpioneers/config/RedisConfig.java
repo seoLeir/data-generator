@@ -3,9 +3,6 @@ package org.bitpioneers.config;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -14,15 +11,56 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
+/**
+* The RedisConfig class is a configuration class responsible for defining and configuring various components related
+ * to the integration of Redis, a popular in-memory data store, into a Spring-based application. This class specifies
+ * the connection factory, serializers, and template operations necessary to interact with Redis efficiently.
+ * <ul>
+ *     <li>
+ *         Redis Connection Configuration: It configures the connection to a Redis server using Lettuce as the client
+ *         library, specifying the server's host and port.
+ *     </li>
+ *     <li>
+ *         Redis Template Configuration: The class defines a RedisTemplate bean, which serves as a central component
+ *         for Redis operations within the application. It sets up the connection factory and customizes the default
+ *         serializer for JSON data using the configured ObjectMapper.
+ *     </li>
+ *     <li>
+ *         Redis Template Operations Configuration: The class defines several methods for creating beans that represent
+ *         various Redis template operations, such as HyperLogLog, Hash, ZSet, and more. These beans are used to perform
+ *         specific operations on Redis data structures.
+ *     </li>
+ *     <li>
+ *         ObjectMapper Configuration: The class provides a method for configuring a default ObjectMapper with features
+ *         tailored for JSON serialization and deserialization, including support for Java time types and default typing
+ *         information.
+ *     </li>
+ * </ul>
+ *
+ * @since 1.0
+ * @author Mirolim Mirzayev
+*/
 @Configuration
 public class RedisConfig {
 
+
+    /**
+     * This method defines a RedisConnectionFactory bean that specifies the connection to the Redis server.
+     * It utilizes Lettuce as the Redis client and configures a connection to a standalone Redis server
+     * running on specific host and port
+     */
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
     }
 
+
+    /**
+    * This method creates and configures a RedisTemplate bean, setting up the connection factory,
+     * default serializer, and ObjectMapper for JSON serialization.
+     * @see RedisTemplate
+     * @param redisConnectionFactory we take from bean RedisFactory
+    */
     @Bean
     public RedisTemplate<?, ?> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         final RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
@@ -77,6 +115,10 @@ public class RedisConfig {
         return template.opsForValue();
     }
 
+    /**
+    * This method configuring a default ObjectMapper with features tailored for JSON serialization and deserialization,
+     * including support for Java time types and default typing information.
+    */
     private static ObjectMapper makeDefaultObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

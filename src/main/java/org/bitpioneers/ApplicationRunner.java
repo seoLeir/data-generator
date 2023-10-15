@@ -1,7 +1,6 @@
 package org.bitpioneers;
 
 import lombok.SneakyThrows;
-import org.bitpioneers.types.PersonType;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
